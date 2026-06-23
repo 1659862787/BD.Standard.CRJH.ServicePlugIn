@@ -311,6 +311,11 @@ namespace WpfApp1
             stockendDate.SelectedDate = DateTime.Now;
         }
 
+        private void datebuton3_Click(object sender, RoutedEventArgs e)
+        {
+            getAppAuthToken();
+        }
+
         public void getAppAuthToken()
         {
             // 1. 定义连接字符串（请替换为你的实际信息）

@@ -22,6 +22,7 @@
                 <MenuItem Header="今天" FontSize="12" x:Name="datebuton"  FontWeight="Black" Click="datebuton_Click" />
                 <MenuItem Header="上月" FontSize="12" x:Name="datebuton1"  FontWeight="Black" Click="datebuton1_Click"/>
                 <MenuItem Header="本月" FontSize="12" x:Name="datebuton2" FontWeight="Black" Click="datebuton2_Click"/>
+                <MenuItem Header="更新token" FontSize="12" x:Name="datebuton3" FontWeight="Black" Click="datebuton3_Click"/>
             </Menu>
 
         </DockPanel>
