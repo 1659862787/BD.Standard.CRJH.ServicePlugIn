@@ -21,8 +21,8 @@ namespace BD.Standard.CRJH.ProgramParse
 
 
            string type = "";
-            string begintime = "1777392000000";
-            string endtime = "1777478400000";
+            string begintime = "1777566120000";
+            string endtime = "1780158120000";
 
             if (args.Any())
             {
@@ -60,7 +60,7 @@ namespace BD.Standard.CRJH.ProgramParse
             org.PostOrg(Con);
 
             DataSet orgIdsSet1 = null;
-            DataSet orgIdsSet0 = Con.getDataSet("select orgId,orgType,inStockType,outStockType from CRJH_org where orgType=1 or (orgType=5 and poiStatus=0)");
+            DataSet orgIdsSet0 = Con.getDataSet("select orgId,orgType,inStockType,outStockType from CRJH_org where orgId='3082269'");
 
             switch (type.ToLower())
             {
@@ -85,7 +85,8 @@ namespace BD.Standard.CRJH.ProgramParse
 
                 case "order":
 
-                    orgIdsSet1 = Con.getDataSet("select orgId,orgType,inStockType,outStockType from CRJH_org where orgType=4 or (orgType=5 and poiStatus=0)");
+                    orgIdsSet1 = Con.getDataSet("select orgId,orgType,inStockType,outStockType from CRJH_org where orgType=4 or (orgType=5 and poiStatus=0)  and merchantNo in (select meituanNumber from CRJH_OrgMapping )");
+
 
                     //采购订单表头
                     PurchaseOrder purchaseOrder = new PurchaseOrder();
@@ -94,7 +95,7 @@ namespace BD.Standard.CRJH.ProgramParse
 
                     //采购订单明细
                     //查询当前时间的采购订单的单号，关联查询组织表CRJH_orgId，获取orgId的orgType，作为查询条件。根据orgId分组，得到Array类型的订单号
-                    DataSet orgIdsSet2 = Con.getDataSet("select orgId,orgType,purchaseOrderSn from  [dbo].[CRJH_PurchaseOrder] p left join [dbo].[CRJH_Org] o on p.orgInfo_orgId=o.orgId where status=0");
+                    DataSet orgIdsSet2 = Con.getDataSet("select orgId,orgType,purchaseOrderSn from  [dbo].[CRJH_PurchaseOrder] p left join [dbo].[CRJH_Org] o on p.orgInfo_orgId=o.orgId where status=0 ");
                     PurchaseOrderEntry purchaseOrderEntry = new PurchaseOrderEntry();
                     purchaseOrderEntry.PostPurchaseOrderEntry(orgIdsSet2);
                     break;
@@ -103,7 +104,7 @@ namespace BD.Standard.CRJH.ProgramParse
                 case "stock":
 
 
-                    orgIdsSet1 = Con.getDataSet("select orgId,orgType,inStockType,outStockType from CRJH_org where orgType=4 or (orgType=5 and poiStatus=0)");
+                    orgIdsSet1 = Con.getDataSet("select orgId,orgType,inStockType,outStockType from CRJH_org where orgType=4 or (orgType=5 and poiStatus=0)  and merchantNo in (select meituanNumber from CRJH_OrgMapping )");
 
                     #region 入库单表头
                     InStock inStock = new InStock();
@@ -124,30 +125,30 @@ namespace BD.Standard.CRJH.ProgramParse
                     outStockEntry.PostOutStockEntry(orgIdsSetOut);
                     #endregion 出库单表头
 
-                    break;
-
-                case "token":
-
-                    //后台授权参数
-                    var accessToken = new access_token();
                     
-                    Console.WriteLine(accessToken.gettoken());
+
+
+                    #region 收货单与返货单、配送单
+
+                    orgIdsSet1 = Con.getDataSet("select itemSn,belongOrg_orgId,sourceSn from  [dbo].[CRJH_InStock] where status=0 and type_id=3 and deliveryWarehouseCode is not null ");
+                    Delivery delivery = new Delivery();
+                    delivery.PostDelivery(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
+                    orgIdsSet1 = Con.getDataSet("select itemSn,sourceSn from  [dbo].[CRJH_OutStock] where status=0 and type_id=7  and deliveryWarehouseCode is not null ");
+                    delivery.PostUnDelivery(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
+
+                    orgIdsSet1 = Con.getDataSet("select itemSn,sourceSn from  [dbo].[CRJH_OutStock] where status=0 and type_id in (6,12)");
+                    delivery.PostdeliveryOrder(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
+                    #endregion 收货单与返货单
+
 
                     break;
-
-                case "updatetoken":
-
-                    //后台授权参数
-                    UpdateToken updateToken = new UpdateToken();
-                    updateToken.Update();
-
-                    break;
-
-
                 case "test":
-                    orgIdsSet1 = Con.getDataSet("select orgId,orgType,inStockType,outStockType from CRJH_org where orgType=5 and poiStatus=0");
-                    OutStock1 outStock1 = new OutStock1();
-                    outStock1.PostOutStock(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
+                    orgIdsSet1 = Con.getDataSet("select 'PFCK2605310011' itemSn ,'PS2605310011' sourceSn");
+                    Delivery delivery1 = new Delivery();
+                    delivery1.PostdeliveryOrder(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
+
+
+
                     break;
 
                 default:

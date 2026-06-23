@@ -62,10 +62,9 @@ namespace BD.Standard.CRJH.ProgramParse.Forms
 
                         JObject result = JObject.Parse(posturlencoded);
 
-                        // ReSharper disable once PossibleNullReferenceException
+
                         if (result["code"].ToString().Equals("OP_SUCCESS"))
                         {
-                            // ReSharper disable once PossibleNullReferenceException
                             MidTableData.InsertTableEntry("InStockEntry", "items", result["data"].ToString());
                         }
                     }

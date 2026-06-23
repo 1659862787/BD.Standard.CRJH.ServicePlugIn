@@ -15,8 +15,6 @@ namespace BD.Standard.CRJH.ProgramParse.Forms
         public void  PostPurchaseOrder(DataSet orgIdsSet, long bizTimeBegin, long bizTimeEnd)
         {
             Logger logger = new Logger(ConfigurationManager.AppSettings["log"] + Logpath, DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
-            logger.WriteLog("orderStartTime开始时间戳：" + bizTimeBegin);
-            logger.WriteLog("orderEndTime结束时间戳：" + bizTimeEnd);
 
             try
             {

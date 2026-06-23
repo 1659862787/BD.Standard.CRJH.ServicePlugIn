@@ -27,19 +27,7 @@ namespace BD.Standard.CRJH.ProgramParse.Forms
                         string orgId = orgIds["orgId"].ToString();
                         string orgType = orgIds["orgType"].ToString();
                         string itemSn = orgIds["itemSn"].ToString();
-                        //itemSn = "ZHJG2506250001";
-                        //if (dics.TryGetValue(orgId + "-" + orgType, out JArray value))
-                        //{
-                        //    value.Add(itemSn);
-                        //}
-                        //else
-                        //{
-                        //    dics.Add(orgId + "-" + orgType, new JArray() { itemSn });
-                        //}
-                        //}
 
-                        //foreach (var dic in dics)
-                        //{
 
                         JObject page = new JObject()
                         {

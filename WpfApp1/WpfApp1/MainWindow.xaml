@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-       Title="美团数据生成" Height="480" Width="850">
+       Title="美团数据生成" Height="450" Width="850">
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -66,7 +66,7 @@
             <Button x:Name="OrderDownLoadButton"  Content="获取数据" Height="26"  Margin="85,5,20,5" Click="OrderDownLoad_Click"/>
             <Button x:Name="OrderUpLoadButton"  Content="生成数据" Height="26"  Margin="85,5,20,5"  Click="OrderUpLoad_Click" />
 
-            <Grid Margin="5,40,5,5" Height="140">
+            <Grid Margin="5" Height="140">
                 <Label x:Name="result"   FontWeight="Black" Content="执行结果:"/>
                 <TextBox x:Name="OrderResult" Margin="80,5,15,5"  FontSize="12" IsReadOnly="False" TextWrapping="Wrap"  VerticalScrollBarVisibility="Auto"/>
             </Grid>
@@ -85,14 +85,7 @@
             </Grid>
             <Button  x:Name="StockDownLoadButton"  Content="获取数据" Height="26"  Margin="85,5,20,5" Click="StockDownLoad_Click"/>
             <Button  x:Name="StockUpLoadButton"  Content="生成数据" Height="26"  Margin="85,5,20,5"  Click="StockUpLoad_Click"/>
-            <Grid Margin="5">
-                <Label x:Name="endText2"   FontWeight="Black" Content="进度/5分钟:"></Label>
-                
-                <Border BorderBrush="Gray" BorderThickness="1" Margin="80,0,15,0">
-                    <ProgressBar x:Name="StockProgressBar" Minimum="0" Maximum="100" Value="0" Height="20" Visibility="Hidden"/>
-                </Border>
-            </Grid>
-
+            
             <Grid Margin="5"  Height="140">
                 <Label x:Name="result1"   FontWeight="Black" Content="执行结果:"/>
                 <TextBox x:Name="StockResult"  Margin="80,5,15,5" FontSize="12" IsReadOnly="False"  TextWrapping="Wrap"   VerticalScrollBarVisibility="Visible"/>

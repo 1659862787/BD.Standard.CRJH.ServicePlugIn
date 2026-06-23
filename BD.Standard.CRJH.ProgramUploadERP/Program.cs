@@ -57,6 +57,7 @@ namespace BD.Standard.CRJH.ProgramUploadERP
                     PurchaseOrder purchaseOrder = new PurchaseOrder();
                     purchaseOrder.PostPurchaseOrder("exec CRJH_erp_PurchaseOrder");
                     break;
+
                 //入库单据生成
                 case "stock":
 

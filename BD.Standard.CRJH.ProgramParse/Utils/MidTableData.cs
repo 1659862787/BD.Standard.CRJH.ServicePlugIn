@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Configuration;
 using System.Data;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -38,9 +39,11 @@ namespace BD.Standard.CRJH.ProgramParse.Utils
                     StringBuilder value = new StringBuilder();
                     sb.Append(string.Format(@"/*dialect*/  insert into {0} ", "CRJH_" + formid));
                     value.Append("  values ");
-                    value.Append("\r\n('" + Regex.Replace(model.ToString(), @"\s+", "") + "',");
+                    //value.Append("\r\n('" + Regex.Replace(model.ToString(), @"\s+", "") + "',");
+                    value.Append("(");
                     DataRow dataH = dataSet.Tables[0].Rows[0];
-                    column.Append("(model,");
+                    //column.Append("(model,");
+                    column.Append("(");
                     string Id = "";
                     string belongOrg_orgId = "";
                     string lastModifyTime = "";
@@ -54,9 +57,14 @@ namespace BD.Standard.CRJH.ProgramParse.Utils
                             var strings = filed.Split('_');
                             if (model.Property(strings[0]) != null)
                             {
+                                //string str = strings.Length == 2
+                                //    ? model[strings[0]][strings[1]].ToString()
+                                //    : model[strings[0]][strings[1]][strings[2]].ToString();
+
                                 string str = strings.Length == 2
-                                    ? model[strings[0]][strings[1]].ToString()
-                                    : model[strings[0]][strings[1]][strings[2]].ToString();
+                                   ? 
+                                   ((JObject)model[strings[0]]).Property(strings[1])!=null ? model[strings[0]][strings[1]].ToString() : ""
+                                   : model[strings[0]][strings[1]][strings[2]].ToString();
 
                                 column.Append("" + filed + ",");
                                 value.Append("'" + str + "',");
@@ -116,7 +124,15 @@ namespace BD.Standard.CRJH.ProgramParse.Utils
                         Con.getDataSet(sb1.ToString());
 
                     }
-                    
+
+                    StringBuilder JsonTable = new StringBuilder();
+                    JsonTable.AppendLine($" IF NOT EXISTS (select 1 from  CRJH_JsonTable where Id='{Id}') ");
+                    JsonTable.AppendLine(" BEGIN ");
+                    JsonTable.AppendLine(string.Format(@"/*dialect*/  insert into CRJH_JsonTable (Id,json) values('{0}','{1}') ", Id, Regex.Replace(model.ToString(), @"\s+", "")));
+                    JsonTable.AppendLine(" END");
+                    Con.getDataSet(JsonTable.ToString());
+
+
 
                 }
 
@@ -164,11 +180,9 @@ namespace BD.Standard.CRJH.ProgramParse.Utils
                     StringBuilder column = new StringBuilder();
                     StringBuilder value = new StringBuilder();
                     sb.Append(string.Format(@"/*dialect*/  insert into {0} ", "CRJH_" + formid));
-                    value.Append("  values ");
-                    value.Append("\r\n('" + Regex.Replace(model.ToString(), @"\s+", "") + "',");
-
+                    value.Append("  values (");
                     DataRow dataH = dataSet.Tables[0].Rows[0];
-                    column.Append("(model,");
+                    column.Append("(");
                     string Id = "";
                     foreach (DataColumn columns in dataH.Table.Columns)
                     {
@@ -189,7 +203,7 @@ namespace BD.Standard.CRJH.ProgramParse.Utils
                             if (model.Property(strings[0]) != null)
                             {
                                 string str = strings.Length == 2
-                                    ? model[strings[0]][strings[1]].ToString()
+                                    ? ((JObject)model[strings[0]]).Property(strings[1]) != null ? model[strings[0]][strings[1]].ToString() : ""
                                     : model[strings[0]][strings[1]][strings[2]].ToString();
 
                                 column.Append("" + filed + ",");
@@ -223,6 +237,14 @@ namespace BD.Standard.CRJH.ProgramParse.Utils
                         sb1.AppendLine(" END");
                         Con.getDataSet(sb1.ToString());
                     }
+                    StringBuilder JsonTable = new StringBuilder();
+                    JsonTable.AppendLine($" IF NOT EXISTS (select 1 from  CRJH_JsonTable where Id='{Id}') ");
+                    JsonTable.AppendLine(" BEGIN ");
+                    JsonTable.AppendLine(string.Format(@"/*dialect*/  insert into CRJH_JsonTable (Id,json) values('{0}','{1}') ", Id, Regex.Replace(model.ToString(), @"\s+", "")));
+                    JsonTable.AppendLine(" END");
+                    Con.getDataSet(JsonTable.ToString());
+
+
                 }
             }
 

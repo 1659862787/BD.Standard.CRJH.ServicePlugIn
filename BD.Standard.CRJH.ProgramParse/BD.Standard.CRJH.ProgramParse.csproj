@@ -50,7 +50,7 @@
     <Compile Include="Authorized\access_token.cs" />
     <Compile Include="Authorized\UpdateToken.cs" />
     <Compile Include="Forms\Org.cs" />
-    <Compile Include="Forms\OutStock1.cs" />
+    <Compile Include="Forms\Delivery.cs" />
     <Compile Include="Forms\PurchaseOrder.cs" />
     <Compile Include="Forms\PurchaseOrderEntry.cs" />
     <Compile Include="Forms\OutStock.cs" />

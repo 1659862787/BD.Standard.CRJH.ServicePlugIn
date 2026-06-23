@@ -1,4 +1,6 @@
 ﻿using BD.Standard.CRJH.ProgramParse.Utils;
+using BD.Standard.FOM.Program.Utils;
+using MySqlConnector;
 using System;
 using System.Configuration;
 using System.Data;
@@ -20,8 +22,8 @@ namespace WpfApp1
         private string DownLoadexePath = ConfigurationManager.AppSettings["DownLoadexePath"];
         private string UpLoadexePath = ConfigurationManager.AppSettings["UpLoadexePath"];
 
-        private static string Stockbegin="";
-        private static string Stockend="";
+        private static string Stockbegin = "";
+        private static string Stockend = "";
 
 
         public MainWindow()
@@ -37,26 +39,26 @@ namespace WpfApp1
             OrderUpLoadButton.IsEnabled = false;
             StockDownLoadButton.IsEnabled = false;
             StockUpLoadButton.IsEnabled = false;
-            Check.IsChecked= false;
+            Check.IsChecked = false;
 
         }
 
-        /// <summary>
-        /// 基础资料获取
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void BaseDownLoad_Click(object sender, RoutedEventArgs e)
-        {
-            var bizTimeBeginorder = Timestamps(DateTime.Now.ToString(), 1);
-            var bizTimeEndorder = Timestamps(DateTime.Now.ToString(), 1);
+        ///// <summary>
+        ///// 基础资料获取
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //private async void BaseDownLoad_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var bizTimeBeginorder = Timestamps(DateTime.Now.ToString(), 1);
+        //    var bizTimeEndorder = Timestamps(DateTime.Now.ToString(), 1);
 
-            //下载程序路径
-            string exePath = @DownLoadexePath;
-            string args = $"base {bizTimeBeginorder} {bizTimeEndorder}";
+        //    //下载程序路径
+        //    string exePath = @DownLoadexePath;
+        //    string args = $"base {bizTimeBeginorder} {bizTimeEndorder}";
 
-            await Clicks("获取基础资料", baseDownLoadButton, baseUpLoadButton, BaseResult, exePath, args,false);
-        }
+        //    await Clicks("获取基础资料", baseDownLoadButton, baseUpLoadButton, BaseResult, exePath, args,false);
+        //}
 
 
 
@@ -67,6 +69,8 @@ namespace WpfApp1
         /// <param name="e"></param>
         private async void OrderDownLoad_Click(object sender, RoutedEventArgs e)
         {
+            getAppAuthToken();
+
             string orderbegin = DateTime.Parse(orderbeginDate.Text).ToString("yyyy-MM-dd 00:00:00");
             string orderend = DateTime.Parse(orderendDate.Text).ToString("yyyy-MM-dd 23:59:59");
 
@@ -79,9 +83,9 @@ namespace WpfApp1
             string args = $"Order {bizTimeBeginorder} {bizTimeEndorder}";
 
 
-            await Clicks("获取订单", OrderDownLoadButton, OrderUpLoadButton, OrderResult, exePath, args,false);
+            await Clicks("获取订单", OrderDownLoadButton, OrderUpLoadButton, OrderResult, exePath, args, false);
         }
-       
+
 
         /// <summary>
         /// 出入库获取
@@ -90,6 +94,8 @@ namespace WpfApp1
         /// <param name="e"></param>
         private async void StockDownLoad_Click(object sender, RoutedEventArgs e)
         {
+
+            getAppAuthToken();
             string stockbegin = DateTime.Parse(stockbeginDate.Text).ToString("yyyy-MM-dd 00:00:00");
             string stockend = DateTime.Parse(stockendDate.Text).ToString("yyyy-MM-dd 23:59:59");
 
@@ -99,25 +105,25 @@ namespace WpfApp1
             //下载程序路径
             string exePath = @DownLoadexePath;
             string args = $"Stock {bizTimeBeginorder} {bizTimeEndorder}";
-            await Clicks("获取出入库", StockDownLoadButton, StockUpLoadButton, StockResult, exePath, args,false);
+            await Clicks("获取出入库", StockDownLoadButton, StockUpLoadButton, StockResult, exePath, args, false);
         }
 
 
-        /// <summary>
-        /// 基础资料生成
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void BaseUpLoad_Click(object sender, RoutedEventArgs e)
-        {
-            
-            //上传程序路径
-            string exePath = @UpLoadexePath;
-            string args = "base";
-            await Clicks("生成基础资料", baseDownLoadButton, baseUpLoadButton, BaseResult, exePath, args,false);
+        ///// <summary>
+        ///// 基础资料生成
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //private async void BaseUpLoad_Click(object sender, RoutedEventArgs e)
+        //{
+
+        //    //上传程序路径
+        //    string exePath = @UpLoadexePath;
+        //    string args = "base";
+        //    await Clicks("生成基础资料", baseDownLoadButton, baseUpLoadButton, BaseResult, exePath, args,false);
 
 
-        }
+        //}
 
         /// <summary>
         /// 订单生成
@@ -154,7 +160,7 @@ namespace WpfApp1
             string stockbegin = DateTime.Parse(stockbeginDate.Text).ToString("yyyy-MM-dd 00:00:00");
             string stockend = DateTime.Parse(stockendDate.Text).ToString("yyyy-MM-dd 23:59:59");
 
-            Stockbegin=stockbegin;
+            Stockbegin = stockbegin;
             Stockend = stockend;
 
             //上传程序路径
@@ -181,14 +187,14 @@ namespace WpfApp1
         /// <param name="exePath"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        private async Task Clicks(string name, Button DownLoadButton, Button UpLoadButton, TextBox Result, string exePath, string args,Boolean flag)
+        private async Task Clicks(string name, Button DownLoadButton, Button UpLoadButton, TextBox Result, string exePath, string args, Boolean flag)
         {
             try
             {
                 DownLoadButton.IsEnabled = false;
                 UpLoadButton.IsEnabled = false;
-                
-                
+
+
                 DateTime begin = DateTime.Now;
                 if (string.IsNullOrWhiteSpace(Result.Text))
                 {
@@ -197,31 +203,6 @@ namespace WpfApp1
                 else
                 {
                     Result.Text = Result.Text + "\r\n" + begin + $":正在{name}数据，请稍等...";
-                }
-
-                System.Timers.Timer timer=null;
-                if (flag)
-                {
-                    StockProgressBar.Value = 0;
-                    StockProgressBar.Visibility = Visibility.Visible;
-                    // 获取初始总数
-                    int totalCount = GetRemainingCount();
-                    int initialCount = totalCount;
-                    StockProgressBar.Maximum = totalCount > 0 ? totalCount : 100;
-
-
-                    // 创建定时器，每分钟更新一次进度
-                    timer = new System.Timers.Timer(300000); // 5分钟
-                    timer.Elapsed += (sender, e) => {
-                        int remaining = GetRemainingCount();
-                        int processed = initialCount - remaining;
-                        // 更新UI需要在UI线程执行
-                        Application.Current.Dispatcher.Invoke(() => {
-                            StockProgressBar.Value = processed;
-                            
-                        });
-                    };
-                    timer.Start();
                 }
 
 
@@ -244,8 +225,6 @@ namespace WpfApp1
                     StringBuilder outputBuilder = new StringBuilder();
                     StringBuilder errorBuilder = new StringBuilder();
 
-
-
                     process.ErrorDataReceived += (sender, e) =>
                     {
                         if (!string.IsNullOrEmpty(e.Data))
@@ -254,20 +233,12 @@ namespace WpfApp1
                         }
                     };
 
-
                     process.Start();
                     // 开始异步读取输出
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
                     await Task.Run(() => process.WaitForExit());
-
-                    if (flag && timer != null)
-                    {
-                        // 停止定时器
-                        timer.Stop();
-                    }
-
 
                     // 最终结果显示
                     string finalOutput = outputBuilder.ToString();
@@ -340,6 +311,73 @@ namespace WpfApp1
             stockendDate.SelectedDate = DateTime.Now;
         }
 
+        public void getAppAuthToken()
+        {
+            // 1. 定义连接字符串（请替换为你的实际信息）
+            string connectionString =
+                "Server=127.0.0.1;Database=rejidb;User ID=root;Password=123@qq.com;Pooling=false;";
+            Logger logger = new Logger("C:\\MeiTuanApi\\WpfApp1\\log", DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
+            try
+            {
+                // 2. 使用using语句确保资源被正确释放
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    // 3. 打开连接
+                    connection.Open();
+                    logger.WriteLog("数据库连接成功！");
+                    // 4. 编写SQL查询语句（使用参数化查询）
+                    string sql = "select * from  meituantoken LIMIT 1";
+
+                    // 5. 创建Command对象
+                    using (MySqlCommand command = new MySqlCommand(sql, connection))
+                    {
+                        // 7. 执行查询并获取DataReader
+                        using (MySqlDataReader reader = command.ExecuteReader())
+                        {
+                            // 8. 循环读取结果
+                            while (reader.Read())
+                            {
+                                // 通过列名或索引获取数据
+                                string accessToken = reader.GetString("accessToken");
+
+                                logger.WriteLog("accessToken！" + accessToken);
+
+                                    // 1. 创建 ExeConfigurationFileMap 实例
+                                    ExeConfigurationFileMap configFileMap = new ExeConfigurationFileMap();
+                                    // 2. 设置外部配置文件的完整路径
+                                    configFileMap.ExeConfigFilename = @"C:\MeiTuanApi\BD.Standard.CRJH.ProgramParse\BD.Standard.CRJH.ProgramParse.exe.config";
+
+                                    // 3. 使用 OpenMappedExeConfiguration 加载配置文件
+                                    //    ConfigurationUserLevel.None 表示加载顶层的配置文件[reference:2][reference:3]
+                                    Configuration config = ConfigurationManager.OpenMappedExeConfiguration(
+                                        configFileMap,
+                                        ConfigurationUserLevel.None
+                                    );
+                                    // 4. 修改 appSettings
+                                    if (config.AppSettings.Settings["appAuthToken"] != null)
+                                    {
+                                        config.AppSettings.Settings["appAuthToken"].Value = accessToken;
+                                    }
+
+                                    // 5. 保存更改
+                                    config.Save(ConfigurationSaveMode.Modified);
+                            }
+                        }
+                    }
+                }
+                
+
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog($"外层异常: {ex.Message}");
+                logger.WriteLog($"内部异常: {ex.InnerException?.Message}");
+                logger.WriteLog($"内部异常的堆栈: {ex.InnerException?.StackTrace}");
+
+            }
+
+        }
+
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             if (!(bool)Check.IsChecked)
@@ -356,10 +394,10 @@ namespace WpfApp1
                 StockDownLoadButton.IsEnabled = true;
                 StockUpLoadButton.IsEnabled = true;
             }
-            
-            
 
-            
+
+
+
 
 
         }
@@ -423,5 +461,5 @@ namespace WpfApp1
 }
 
 
-    
-    
+
+
