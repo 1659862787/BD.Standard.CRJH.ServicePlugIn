@@ -130,7 +130,7 @@ namespace BD.Standard.CRJH.ProgramParse
 
                     #region 收货单与返货单、配送单
 
-                    orgIdsSet1 = Con.getDataSet("select itemSn,belongOrg_orgId,sourceSn from  [dbo].[CRJH_InStock] where status=0 and type_id=3 and deliveryWarehouseCode is null ");
+                    orgIdsSet1 = Con.getDataSet("select itemSn,belongOrg_orgId,sourceSn from  [dbo].[CRJH_InStock] where status=0 and type_id in=3 and deliveryWarehouseCode is null ");
                     Delivery delivery = new Delivery();
                     delivery.PostDelivery(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
                     orgIdsSet1 = Con.getDataSet("select itemSn,sourceSn from  [dbo].[CRJH_OutStock] where status=0 and type_id=7  and deliveryWarehouseCode is null ");
