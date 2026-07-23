@@ -130,10 +130,15 @@ namespace BD.Standard.CRJH.ProgramParse
 
                     #region 收货单与返货单、配送单
 
-                    orgIdsSet1 = Con.getDataSet("select itemSn,belongOrg_orgId,sourceSn from  [dbo].[CRJH_InStock] where status=0 and type_id in=3 and deliveryWarehouseCode is null ");
+                    orgIdsSet1 = Con.getDataSet("select itemSn,belongOrg_orgId,sourceSn from  [dbo].[CRJH_InStock] where status=0 and type_id =3 and deliveryWarehouseCode is null ");
                     Delivery delivery = new Delivery();
                     delivery.PostDelivery(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
-                    orgIdsSet1 = Con.getDataSet("select itemSn,sourceSn from  [dbo].[CRJH_OutStock] where status=0 and type_id=7  and deliveryWarehouseCode is null ");
+                    StringBuilder stringBuilder=new StringBuilder();
+                    stringBuilder.AppendLine("select itemSn,sourceSn,'CRJH_InStock' tablename from  [dbo].[CRJH_InStock] where status=0 and type_id=20  and deliveryWarehouseCode is null");
+                    stringBuilder.AppendLine("union all");
+                    stringBuilder.AppendLine("select itemSn,sourceSn,'CRJH_OutStock' tablename from  [dbo].[CRJH_OutStock] where status=0 and type_id=7  and deliveryWarehouseCode is null");
+
+                    orgIdsSet1 = Con.getDataSet(stringBuilder.ToString());
                     delivery.PostUnDelivery(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
 
                     orgIdsSet1 = Con.getDataSet("select itemSn,sourceSn from  [dbo].[CRJH_OutStock] where status=0 and type_id in (6,12)");
@@ -143,9 +148,10 @@ namespace BD.Standard.CRJH.ProgramParse
 
                     break;
                 case "test":
-                    orgIdsSet1 = Con.getDataSet("select 'PFCK2605310011' itemSn ,'PS2605310011' sourceSn");
+                    //orgIdsSet1 = Con.getDataSet("select 'FBRK2606230001' itemSn ,'3102122' belongOrg_orgId,'FH2606230003' sourceSn");
+                    orgIdsSet1 = Con.getDataSet("select 'FBRK2606230001' itemSn ,'FH2606230003' sourceSn");
                     Delivery delivery1 = new Delivery();
-                    delivery1.PostdeliveryOrder(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
+                    delivery1.PostUnDelivery(orgIdsSet1, Convert.ToInt64(begintime), Convert.ToInt64(endtime));
 
 
 
